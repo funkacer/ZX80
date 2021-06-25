@@ -1,0 +1,117 @@
+# file opened: colors2.asm
+  1   0000                  DEVICE ZXSPECTRUM48
+  2   0000
+  3   0000                  org $8000
+  4   8000
+  5   8000 C3 55 80         jp start             ; jump over data to code (extended immediate)
+  6   8003
+  7   8003              string:
+  8   8003 61 62 63 64      db "abcdefghijklmnopqrstuvwxyz012345"
+  8   8007 65 66 67 68
+  8   800B 69 6A 6B 6C
+  8   800F 6D 6E 6F 70
+  8   8013 71 72 73 74
+  8   8017 75 76 77 78
+  8   801B 79 7A 30 31
+  8   801F 32 33 34 35
+  9   8023
+ 10   8023              eostring equ $
+ 11   8023
+ 12   8023 10 02 11 06  stringg defb 16,2,17,6,22,3,11, "HELLO!"
+ 12   8027 16 03 0B 48
+ 12   802B 45 4C 4C 4F
+ 12   802F 21
+ 13   8030
+ 14   8030              eostringg equ $
+ 15   8030
+ 16   8030 00 18 3C 7E  udgs defb 0,24,60,126,126,60,24,0
+ 16   8034 7E 3C 18 00
+ 17   8038
+ 18   8038              colors:
+ 19   8038 01               db $01
+ 20   8039 02               db $02
+ 21   803A 03               db $03
+ 22   803B 04               db $04
+ 23   803C 05               db $05
+ 24   803D 06               db $06
+ 25   803E 07               db $07
+ 26   803F 08               db $08
+ 27   8040 19               db $19
+ 28   8041 0A               db $0A
+ 29   8042 0B               db $0B
+ 30   8043 8C               db $8C
+ 31   8044 0D               db $0D
+ 32   8045 0E               db $0E
+ 33   8046 0F               db $0F
+ 34   8047
+ 35   8047              board
+ 36   8047 16 0A 0C         defb 22,10,12
+ 37   804A 10 07 11 01      defb 16,7,17,1
+ 38   804E 90 90 90 90      defb 144,144,144,144,144,144,144
+ 38   8052 90 90 90
+ 39   8055
+ 40   8055              eoboard equ $
+ 41   8055
+ 42   8055              STRING_LENGTH  = eostring - string
+ 43   8055              LINES = 22
+ 44   8055
+ 45   8055              ROM_CLS        = $0DAF  ; ROM address for "Clear Screen" routine
+ 46   8055              COLOR_ATTR     = $5800  ; start of color attribute memory
+ 47   8055              ENTER          = $0D    ; Character code for Enter key
+ 48   8055              BLACK_WHITE    = $47    ; black paper, white ink
+ 49   8055              WHITE_BLACK    = $78    ; white paper, black ink
+ 50   8055              WHITE_BLUE     = $79    ; white paper, blue ink
+ 51   8055              WHITE_RED      = $7A    ; white paper, red ink
+ 52   8055              WHITE_MAGENTA  = $7B    ; white paper, magenta ink
+ 53   8055              WHITE_GREEN    = $7C    ; white paper, green ink
+ 54   8055              WHITE_CYAN     = $7D    ; white paper, cyan ink
+ 55   8055              WHITE_YELLOW   = $7E    ; white paper, yellow ink
+ 56   8055              WHITE_WHITE    = $7F    ; white paper, white ink
+ 57   8055
+ 58   8055              start:
+ 59   8055 ED 56            im 1                 ; Set interrupt mode to 1 (interrupt mode)
+ 60   8057 CD AF 0D         call ROM_CLS         ; Call clear screen routine from ROM (extended immediate)
+ 61   805A 0E 16            ld c,LINES
+ 62   805C DD 21 00 58      ld ix,COLOR_ATTR         ; IX = address of string (register,extended immediate)
+ 63   8060
+ 64   8060              line:
+ 65   8060 21 03 80         ld hl,string         ; HL = address of string (register,extended immediate)
+ 66   8063 06 20            ld b,STRING_LENGTH   ; B = length of string (register,immediate)
+ 67   8065 11 38 80         ld de,colors
+ 68   8068
+ 69   8068              loop:
+ 70   8068 7E               ld a,(hl)            ; A = byte at address in HL (register,register indirect)
+ 71   8069 D7               rst $10              ; print character code in A (modified page zero)
+ 72   806A 23               inc hl               ; increment HL to address of next character (register)
+ 73   806B 05               dec b                ; decrement B (register)
+ 74   806C 1A               ld a, (de)           ; load color to A (register)
+ 75   806D DD 77 00         ld (ix),a            ; load A to current color attribute memory address
+ 76   8070 DD 23            inc ix
+ 77   8072 13               inc de               ; increment color attribute memory address
+ 78   8073 20 F3            jr nz,loop           ; if B not zero, jump back to top of loop (condition,relative)
+ 79   8075 3E 0D            ld a,ENTER           ; A = Enter character code (register,immediate)
+ 80   8077 D7               rst $10              ; print Enter for new line (modified page zero)
+ 81   8078
+ 82   8078 0D               dec c                ; decrement B (register)
+ 83   8079 20 E5            jr nz,line
+ 84   807B
+ 85   807B 06 32            ld b, 50
+ 86   807D 21 30 80         ld hl, udgs
+ 87   8080 22 7B 5C         ld (23675), hl
+ 88   8083 3E 02            ld a,2
+ 89   8085 CD 01 16         call 5633
+ 90   8088 11 23 80         ld de, stringg
+ 91   808B 01 0D 00         ld bc, eostringg-stringg
+ 92   808E CD 3C 20         call 8252
+ 93   8091              move:
+ 94   8091 3E 90            ld a, 144
+ 95   8093 D7               rst 16
+ 96   8094 05               dec b
+ 97   8095 20 FA            jr nz, move
+ 98   8097
+ 99   8097 C9               ret
+100   8098
+101   8098              ; Deployment: Snapshot
+102   8098                 SAVESNA "colors2.sna", start
+103   8098
+# file closed: colors2.asm
