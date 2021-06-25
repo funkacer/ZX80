@@ -1,0 +1,84 @@
+# file opened: colors1.asm
+ 1    0000                  DEVICE ZXSPECTRUM48
+ 2    0000
+ 3    0000                  org $8000
+ 4    8000
+ 5    8000 C3 32 80         jp start             ; jump over data to code (extended immediate)
+ 6    8003
+ 7    8003              string:
+ 8    8003 61 62 63 64      db "abcdefghijklmnopqrstuvwxyz012345"
+ 8    8007 65 66 67 68
+ 8    800B 69 6A 6B 6C
+ 8    800F 6D 6E 6F 70
+ 8    8013 71 72 73 74
+ 8    8017 75 76 77 78
+ 8    801B 79 7A 30 31
+ 8    801F 32 33 34 35
+ 9    8023              colors:
+10    8023 01               db $01
+11    8024 02               db $02
+12    8025 03               db $03
+13    8026 04               db $04
+14    8027 05               db $05
+15    8028 06               db $06
+16    8029 07               db $07
+17    802A 08               db $08
+18    802B 19               db $19
+19    802C 0A               db $0A
+20    802D 0B               db $0B
+21    802E 8C               db $8C
+22    802F 0D               db $0D
+23    8030 0E               db $0E
+24    8031 0F               db $0F
+25    8032
+26    8032              STRING_LENGTH  = 32
+27    8032              LINES = 22
+28    8032
+29    8032              ROM_CLS        = $0DAF  ; ROM address for "Clear Screen" routine
+30    8032              COLOR_ATTR     = $5800  ; start of color attribute memory
+31    8032              ENTER          = $0D    ; Character code for Enter key
+32    8032              BLACK_WHITE    = $47    ; black paper, white ink
+33    8032              WHITE_BLACK    = $78    ; white paper, black ink
+34    8032              WHITE_BLUE     = $79    ; white paper, blue ink
+35    8032              WHITE_RED      = $7A    ; white paper, red ink
+36    8032              WHITE_MAGENTA  = $7B    ; white paper, magenta ink
+37    8032              WHITE_GREEN    = $7C    ; white paper, green ink
+38    8032              WHITE_CYAN     = $7D    ; white paper, cyan ink
+39    8032              WHITE_YELLOW   = $7E    ; white paper, yellow ink
+40    8032              WHITE_WHITE    = $7F    ; white paper, white ink
+41    8032
+42    8032              start:
+43    8032 ED 56            im 1                 ; Set interrupt mode to 1 (interrupt mode)
+44    8034 CD AF 0D         call ROM_CLS         ; Call clear screen routine from ROM (extended immediate)
+45    8037 0E 16            ld c,LINES
+46    8039 DD 21 00 58      ld ix,COLOR_ATTR         ; IX = address of string (register,extended immediate)
+47    803D
+48    803D              line:
+49    803D 21 03 80         ld hl,string         ; HL = address of string (register,extended immediate)
+50    8040 06 20            ld b,STRING_LENGTH   ; B = length of string (register,immediate)
+51    8042 11 23 80         ld de,colors
+52    8045
+53    8045              loop:
+54    8045 7E               ld a,(hl)            ; A = byte at address in HL (register,register indirect)
+55    8046 D7               rst $10              ; print character code in A (modified page zero)
+56    8047 23               inc hl               ; increment HL to address of next character (register)
+57    8048 05               dec b                ; decrement B (register)
+58    8049 1A               ld a, (de)           ; load color to A (register)
+59    804A DD 77 00         ld (ix),a            ; load A to current color attribute memory address
+60    804D DD 23            inc ix
+61    804F 13               inc de               ; increment color attribute memory address
+62    8050 20 F3            jr nz,loop           ; if B not zero, jump back to top of loop (condition,relative)
+63    8052 3E 0D            ld a,ENTER           ; A = Enter character code (register,immediate)
+64    8054 D7               rst $10              ; print Enter for new line (modified page zero)
+65    8055
+66    8055 0D               dec c                ; decrement B (register)
+67    8056 20 E5            jr nz,line
+68    8058
+69    8058 18 D8            jr start
+70    805A
+71    805A C9               ret
+72    805B
+73    805B              ; Deployment: Snapshot
+74    805B                 SAVESNA "colors1.sna", start
+75    805B
+# file closed: colors1.asm

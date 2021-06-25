@@ -1,0 +1,15 @@
+# file opened: load_jc.asm
+ 1    0000                 DEVICE ZXSPECTRUM48
+ 2    0000
+ 3    0000                 org $8000
+ 4    8000
+ 5    8000              start:
+ 6    8000 3E D6           ld a,$D6
+ 7    8002 32 00 58        ld ($5800),a
+ 8    8005 32 01 58        ld ($5801),a
+ 9    8008 C9              ret
+10    8009
+11    8009              ; Deployment: Snapshot
+12    8009                 SAVESNA "load_jc.sna", start
+13    8009
+# file closed: load_jc.asm

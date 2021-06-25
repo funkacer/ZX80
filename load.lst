@@ -1,0 +1,14 @@
+# file opened: load.asm
+ 1    0000                 DEVICE ZXSPECTRUM48
+ 2    0000
+ 3    0000                 org $8000
+ 4    8000
+ 5    8000              start:
+ 6    8000 3E D6           ld a,$D6
+ 7    8002 32 00 58        ld ($5800),a
+ 8    8005 C9              ret
+ 9    8006
+10    8006              ; Deployment: Snapshot
+11    8006                 SAVESNA "load.sna", start
+12    8006
+# file closed: load.asm

@@ -1,0 +1,67 @@
+# file opened: colors.asm
+ 1    0000                  DEVICE ZXSPECTRUM48
+ 2    0000
+ 3    0000                  org $8000
+ 4    8000
+ 5    8000 C3 1B 80         jp start             ; jump over data to code (extended immediate)
+ 6    8003
+ 7    8003              string:
+ 8    8003 48 65 6C 6C      db "Hello_world!"
+ 8    8007 6F 5F 77 6F
+ 8    800B 72 6C 64 21
+ 9    800F              colors:
+10    800F 47               db $47
+11    8010 78               db $78
+12    8011 79               db $79
+13    8012 7A               db $7A
+14    8013 7B               db $7B
+15    8014 7C               db $7C
+16    8015 7D               db $7D
+17    8016 7E               db $7E
+18    8017 70               db $70
+19    8018 38               db $38
+20    8019 07               db $07
+21    801A D6               db $D6
+22    801B
+23    801B              STRING_LENGTH  = 12
+24    801B
+25    801B              ROM_CLS        = $0DAF  ; ROM address for "Clear Screen" routine
+26    801B              COLOR_ATTR     = $5800  ; start of color attribute memory
+27    801B              ENTER          = $0D    ; Character code for Enter key
+28    801B              BLACK_WHITE    = $47    ; black paper, white ink
+29    801B              WHITE_BLACK    = $78    ; white paper, black ink
+30    801B              WHITE_BLUE     = $79    ; white paper, blue ink
+31    801B              WHITE_RED      = $7A    ; white paper, red ink
+32    801B              WHITE_MAGENTA  = $7B    ; white paper, magenta ink
+33    801B              WHITE_GREEN    = $7C    ; white paper, green ink
+34    801B              WHITE_CYAN     = $7D    ; white paper, cyan ink
+35    801B              WHITE_YELLOW   = $7E    ; white paper, yellow ink
+36    801B              WHITE_WHITE    = $7F    ; white paper, white ink
+37    801B
+38    801B              start:
+39    801B ED 56            im 1                 ; Set interrupt mode to 1 (interrupt mode)
+40    801D CD AF 0D         call ROM_CLS         ; Call clear screen routine from ROM (extended immediate)
+41    8020 21 03 80         ld hl,string         ; HL = address of string (register,extended immediate)
+42    8023 06 0C            ld b,STRING_LENGTH   ; B = length of string (register,immediate)
+43    8025 11 0F 80         ld de,colors
+44    8028 DD 21 00 58      ld ix,COLOR_ATTR         ; IX = address of string (register,extended immediate)
+45    802C
+46    802C              loop:
+47    802C 7E               ld a,(hl)            ; A = byte at address in HL (register,register indirect)
+48    802D D7               rst $10              ; print character code in A (modified page zero)
+49    802E 23               inc hl               ; increment HL to address of next character (register)
+50    802F 05               dec b                ; decrement B (register)
+51    8030 1A               ld a, (de)           ; load color to A (register)
+52    8031 DD 77 00         ld (ix),a            ; load A to current color attribute memory address
+53    8034 DD 23            inc ix
+54    8036 13               inc de               ; increment color attribute memory address
+55    8037 20 F3            jr nz,loop           ; if B not zero, jump back to top of loop (condition,relative)
+56    8039 3E 0D            ld a,ENTER           ; A = Enter character code (register,immediate)
+57    803B D7               rst $10              ; print Enter for new line (modified page zero)
+58    803C
+59    803C C9               ret
+60    803D
+61    803D              ; Deployment: Snapshot
+62    803D                 SAVESNA "colors.sna", start
+63    803D
+# file closed: colors.asm
