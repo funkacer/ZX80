@@ -1,0 +1,43 @@
+# file opened: video_1_1.asm
+ 1    0000                 DEVICE ZXSPECTRUM48
+ 2    0000
+ 3    0000                 org $8000
+ 4    8000 C3 03 80        jp start
+ 5    8003
+ 6    8003              start:
+ 7    8003 CD AF 0D         call $0DAF  ; ROM address for "Clear Screen" routine
+ 8    8006 3E D6            ld a,$D6
+ 9    8008 32 00 58         ld ($5800),a
+10    800B 21 00 58         ld hl, $5800
+11    800E 11 C0 02         ld de, 704
+12    8011
+13    8011              restart:
+14    8011 06 00            ld b, 0
+15    8013 0E 00            ld c, 0
+16    8015              loop:
+17    8015 3E 41            ld a,"A"         ; A = byte at address in HL (register,register indirect)
+18    8017 D7               rst $10
+19    8018                  ;ld a, $D6
+20    8018 79               ld a, c
+21    8019 77               ld (hl),a
+22    801A 23               inc hl
+23    801B                  ;inc ix
+24    801B 0C               inc c
+25    801C 1B               dec de              ;decrease BC. this instruction does not affect flags
+26    801D 7A               ld a, d             ;so we have to check condition (BC equals 0) in different way
+27    801E B3               or e                ;if B and C are equal to zero then result of (B OR C) is zero too
+28    801F                  ;jp nz, loop         ;if not zero then repeat
+29    801F 28 05            jr z, end
+30    8021 05               dec b
+31    8022 20 F1            jr nz, loop
+32    8024 18 EB            jr restart
+33    8026
+34    8026
+35    8026              end:
+36    8026
+37    8026 C9               ret
+38    8027
+39    8027              ; Deployment: Snapshot
+40    8027                 SAVESNA "video_1_1.sna", start
+41    8027
+# file closed: video_1_1.asm
