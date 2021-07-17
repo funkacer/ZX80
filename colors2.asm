@@ -55,8 +55,9 @@ WHITE_CYAN     = $7D    ; white paper, cyan ink
 WHITE_YELLOW   = $7E    ; white paper, yellow ink
 WHITE_WHITE    = $7F    ; white paper, white ink
 
+last_k equ 23560
+
 start:
-    im 1                 ; Set interrupt mode to 1 (interrupt mode)
     call ROM_CLS         ; Call clear screen routine from ROM (extended immediate)
     ld c,LINES
     ld ix,COLOR_ATTR         ; IX = address of string (register,extended immediate)
@@ -90,11 +91,24 @@ loop:
     ld de, stringg
     ld bc, eostringg-stringg
     call 8252
+
 move:
     ld a, 144
     rst 16
     dec b
     jr nz, move
+
+    ld b, 100
+
+wait:
+    ld hl, last_k
+    ld a, (hl)
+    cp 112
+    jr z, cls
+    jr wait
+
+cls:
+    call ROM_CLS
 
     ret
 

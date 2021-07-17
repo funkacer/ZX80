@@ -1,0 +1,35 @@
+# file opened: colors3.asm
+ 1    0000                  DEVICE ZXSPECTRUM48
+ 2    0000
+ 3    0000                  org $8000
+ 4    8000
+ 5    8000              last_k = 23560
+ 6    8000              ROM_CLS = $0DAF
+ 7    8000
+ 8    8000              start:
+ 9    8000 ED 56            im 1
+10    8002 06 FF            ld b, 255
+11    8004
+12    8004              loop:
+13    8004 21 08 5C         ld hl, last_k
+14    8007 7E               ld a, (hl)
+15    8008 FE 70            cp 112
+16    800A 28 06            jr z, cls
+17    800C D7               rst $10
+18    800D 05               dec b
+19    800E 28 02            jr z, cls
+20    8010 18 F2            jr loop
+21    8012
+22    8012              cls:
+23    8012 CD AF 0D         call ROM_CLS
+24    8015 21 08 5C         ld hl,last_k
+25    8018 7E               ld a,(hl)            ; A = byte at address in HL (register,register indirect)
+26    8019 D7               rst $10
+27    801A 18 E4            jr start
+28    801C
+29    801C C9               ret
+30    801D
+31    801D              ; Deployment: Snapshot
+32    801D                 SAVESNA "colors3.sna", start
+33    801D
+# file closed: colors3.asm
